@@ -1,4 +1,6 @@
 from room import Room
+from player import Player
+from item import Item
 
 # Declare all the rooms
 
@@ -38,6 +40,7 @@ room['treasure'].s_to = room['narrow']
 #
 
 # Make a new player object that is currently in the 'outside' room.
+player = Player('Steve', room['outside'])
 
 # Write a loop that:
 #
@@ -45,7 +48,57 @@ room['treasure'].s_to = room['narrow']
 # * Prints the current description (the textwrap module might be useful here).
 # * Waits for user input and decides what to do.
 #
+
+
+def player_action(instructions):
+    action = instructions.split()
+    if (len(action) == 1):
+        if instructions == 'i' or instructions == 'inventory':
+            player.inventory()
+        else:
+            if hasattr(player.current_room, f"{instructions}_to"):
+                player.move(instructions)
+            else:
+                print('There is no room that direction, please try again')
+    elif (len(action) == 2):
+        if (action[0] == 'get' or action[0] == 'take'):
+            for index, item in enumerate(player.current_room.items):
+                if (item.name == action[1]):
+                    item = player.current_room.items.pop(index)
+                    player.items.append(item)
+                    item.on_take()
+                else:
+                    print('Item does not exist in this room')
+        elif (action[0] == 'drop'):
+            for index, item in enumerate(player.items):
+                if (item.name == action[1]):
+                    item = player.items.pop(index)
+                    player.current_room.items.append(item)
+                    item.on_drop()
+                else:
+                    print('Item does not exist in this room')
+
 # If the user enters a cardinal direction, attempt to move to the room there.
 # Print an error message if the movement isn't allowed.
 #
 # If the user enters "q", quit the game.
+# f"{David.name} is currently {David.currentRoom}. Enter a new direction I.E North, South, East or West:")
+
+
+def adv_game():
+    action = ''
+    while(action != 'q'):
+        print(player.current_room.name)
+        print(player.current_room.description)
+        # for item in player.current_room.items:
+        #     print(item)
+        # print(f'Items in the current room: {for item in player.current_room.items}')
+        action = input('What would you like to do? You can [drop] or [get] items in the current room, or view your [i]nventory. Or, you can  [w]est [e]ast [s]outh [n]orth:')
+        player_action(action)
+        # if hasattr(player.current_room, f"{direction}_to"):
+        #     player.move(direction)
+        # else:
+        #     print('There is no room that direction, please try again')
+
+
+adv_game()
